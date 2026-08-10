@@ -47,4 +47,4 @@
 
 ./hydra_sim -ind GB-input/hydra_sim_2100_v4.dat -ainp hydra_sim_v5.pin -nohess -maxfn 1 -maxph1  # works
 ./hydra_sim -ind GB-input/hydra_sim_2100_v5.dat -ainp hydra_sim_v5.pin -nohess -maxfn 1 -maxph1  # works
-./hydra_sim -ind GB-input/hydra_sim_MatRecEnv.dat -ainp hydra_sim_v5.pin -nohess -maxfn 1 -maxph1  # works, but addition of any other env betas on growth leads to NaNs in some likelihoods
+./hydra_NCLIM -ind GB-input/hydra_sim_MatRecEnv.dat -ainp hydra_sim_v5.pin -nohess  # works, but addition of any other env betas on growth leads to NaNs in some likelihoods
