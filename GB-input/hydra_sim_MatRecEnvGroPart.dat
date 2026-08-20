@@ -1316,7 +1316,7 @@
 #  init_int recphase				//recruitment parameter estimation phas
   -1
 #  init_int avg_rec_phase		//average recruitment estimation phase (could make species specific, currently global)
-  1
+  -1
 #  init_int recsigmaphase			//st dev of recruitment devs phase
   -1
 #  init_int avg_F_phase			//average fishing mort estimation phase (could make species specific, currently global)
@@ -1338,13 +1338,13 @@
 #  init_int csig_phase           //catch sigma (obs error) phase
   -1
 #  init_int m1_phase            // M1 phase
-  1
+  -1
 #  init_int oF1_phase           // amount of other food included in the M2 term for the base (predator 1) phase
-  1
+  -1
 #   init_int oFdev_phase          //deviation from base other food for predators 2+ phase
   -1
 #   init_int vuln_phase // phase for vulnerability parameters
-  1
+  -1
 #  init_matrix recGamma_alpha(1,Nareas,1,Nspecies)			//eggprod gamma Ricker model alpha
   1 1 1 1 1 1 1 1 1 1
 #  init_matrix recGamma_shape(1,Nareas,1,Nspecies)			//eggprod gamma Ricker model shape parameter
@@ -1401,6 +1401,7 @@
 #  init_matrix sexratio(1,Nareas,1,Nspecies)  // this is proportion females
   0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5
  #  init_matrix recruitment_covwt(1,Nspecies,1,Nrecruitment_cov)	//recruitment covariate weighting factor
+#  0 0 0 0 0 0 0 0 0 0
   0.22535147
   0.28066364
   -0.25339322
@@ -1646,11 +1647,11 @@
 # m1_change_yr
   43
 # m1_multiplier
-  1.5
+  1
 # of_change_yr
   43
 # of_multiplier
-  1.5
+  1
 # use annual q? (0 = fixed over time, 1 = annual parameter vector)
   0
 # eof
