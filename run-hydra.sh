@@ -43,8 +43,11 @@
 ./hydra_sim -ind GB-input/hydra_sim_2100_v3.dat -ainp hydra_sim.pin -nohess   # works
 ./hydra_sim -ind GB-input/hydra_sim_2100_v4.dat -ainp hydra_sim.pin -nohess -maxfn 1 -maxph1  # works, diagnostics ok
 ./hydra_sim -ind GB-input/hydra_sim_2100_v4_MatEnvRec.dat -ainp hydra_sim.pin -nohess  # works, diagnostics ok
-./hydra_sim -ind GB-input/hydra_sim_MatRecEnvGroPart.dat -ainp hydra_sim.pin -nohess  #
+./hydra_sim -ind GB-input/hydra_sim_MatRecEnvGroPart.dat -ainp hydra_sim.pin -nohess  # works, but addition of any other env betas on growth leads to NaNs in some likelihoods
+./hydra_sim -ind GB-input/hydra_sim_MatRecEnvGroPart_v2.dat -ainp hydra_sim.pin -nohess -maxfn 1  # works; growth, length bin, stomach weights updated for Cod, Silver Hake
+./hydra_sim -ind GB-input/hydra_sim_MatRecEnvGroPart_v3.dat -ainp hydra_sim.pin -nohess -maxfn 1  # works; growth, length bin, stomach weights updated for YT Flounder 
+./hydra_sim -ind GB-input/hydra_sim_MatRecEnvGroPart_v4.dat -ainp hydra_sim.pin -nohess -1   # works; growth and length bins (but not stomach weights!) updated for Herring
+./hydra_sim -ind GB-input/hydra_sim_MatRecEnvGroPart_v5.dat -ainp hydra_sim.pin -nohess -maxfn 1   # works; growth, length bins and stomach weights updated for Haddock; growth/length bins updated for Mackerel, Goosefish, Spiny Dogfish
+./hydra_sim -ind GB-input/hydra_sim_MatRecEnvGroPart_v6.dat -ainp hydra_sim.pin -nohess -maxfn 1   # works; growth and length bins updated for Winter Flounder; length bins updated for Winter Skate
 
-./hydra_sim -ind GB-input/hydra_sim_2100_v4.dat -ainp hydra_sim_v5.pin -nohess -maxfn 1 -maxph1  # works
-./hydra_sim -ind GB-input/hydra_sim_2100_v5.dat -ainp hydra_sim_v5.pin -nohess -maxfn 1 -maxph1  # works
-./hydra_NCLIM -ind GB-input/hydra_sim_MatRecEnv.dat -ainp hydra_sim_v5.pin -nohess  # works, but addition of any other env betas on growth leads to NaNs in some likelihoods
+

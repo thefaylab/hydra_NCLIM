@@ -246,6 +246,8 @@ model_data::model_data(int argc,char * argv[]) : ad_comm(argc,argv)
   growthprob_phi.allocate(1,Nareas,1,Nspecies,1,Nyrs,1,Nsizebins);
   delta_t.allocate(1,Nsizebins);
   lmax_test.allocate(1,2);
+  growth_numerator.allocate(1,Nsizebins);
+  growth_denominator.allocate(1,Nsizebins);
   for (area=1; area<=Nareas; area++){
 	for(spp=1; spp<=Nspecies; spp++){
      for(yr=1; yr<=Nyrs; yr++){
@@ -282,9 +284,14 @@ model_data::model_data(int argc,char * argv[]) : ad_comm(argc,argv)
           }
         break;
         case 4:       //VonB with covariates
+ ////////// 2026-08-10 GAVIN FAY, added this trap because as growth varies over time bin mins/maxs may not align with adjusted Linfinitys. This may not be the best way to do it.
+          growth_numerator = (vonB_Linf(area, spp)*mfexp(growth_covwt(spp)*trans(growth_cov)(yr))-lbinmin(spp));
+          growth_denominator = (vonB_Linf(area, spp)*mfexp(growth_covwt(spp)*trans(growth_cov)(yr))-lbinmax(spp));
+      for (size=1;size<Nsizebins;size++) { 
+         if(growth_denominator(size)<0.) growth_denominator(size) = 0.001;
+      } 
           growthprob_phi(area, spp, yr) = vonB_k(area, spp)/log(
-                                          elem_div((vonB_Linf(area, spp)*mfexp(growth_covwt(spp)*trans(growth_cov)(yr))-lbinmin(spp)),
-                                                   (vonB_Linf(area, spp)*mfexp(growth_covwt(spp)*trans(growth_cov)(yr))-lbinmax(spp))));
+                                          elem_div(growth_numerator,growth_denominator));
         break;
         default:
           cout<<"undefined growth type, check .dat file"<<endl;
@@ -293,6 +300,7 @@ model_data::model_data(int argc,char * argv[]) : ad_comm(argc,argv)
       growthprob_phi(area, spp, yr)(Nsizebins) = 0.0; //set prob of outgrowing highest bin to 0
       double tempmax =  max(growthprob_phi(area, spp, yr));
       phimax = max(tempmax,phimax);
+ cout << "Growthprob " << spp << " " << growthprob_phi(area,spp,yr) << endl;
 	  }
 	}
     growthprob_phi(area) /= phimax;  //rescale so no group has >1 prob growing out
@@ -597,7 +605,7 @@ obs_effortAssess = obs_effort;
     suitpreybio.initialize();
   #endif
 cout << "Nprey " << Nprey << endl;
-  logit_vuln.allocate(1,Npreypar,vuln_phase,"logit_vuln");
+  logit_vuln.allocate(1,Npreypar,-10,10,vuln_phase,"logit_vuln");
   vulnerability.allocate(1,Nareas,1,Nspecies,1,Nspecies,"vulnerability");
   #ifndef NO_AD_INITIALIZE
     vulnerability.initialize();
@@ -1055,9 +1063,11 @@ void model_parameters::preliminary_calculations(void)
       for (yr=1; yr<=Nyrs; yr++) {
           for (int icov=1; icov<=Nmaturity_cov;icov++) {
               covariates_M(spp,yr) += maturity_covwt(spp,icov)*maturity_cov(icov,yr);
+              //cout << spp << " " << yr << " " << covariates_M(spp,yr) << endl;
           }
       }
   }
+  
 }
 
 void model_parameters::userfunction(void)
@@ -1287,7 +1297,7 @@ void model_parameters::calc_initial_states(void)
   // est_catch_guild_biomass.initialize();
   // est_survey_biomass_assessment.initialize();
   // est_fleet_catch_guild_assessment.initialize();
-  covariates_M.initialize();
+  //covariates_M.initialize();   // GAVIN FAY 2026-08-05 commenting out as covariate effects are calculated during prelim calcs
   index_predBio.initialize();
   index_preyBio.initialize();
   index_predToPreyRatio.initialize();
@@ -1336,15 +1346,11 @@ void model_parameters::calc_initial_states(void)
                     // make an exception for dogfish, (species 1). SR relationship used only females. therefore SSB should only use females.
                     // females considered to be only members of largest size class and only class that can reproduce
                     // this isn't smart coding. ideally we'd want a function that would create this and we'd just pass parameter values in dat file
-                     if ((spp == 1) && (isizebin < Nsizebins)) {
-                        propmature(area,spp,yr,isizebin) = 0;
-                     } else if ((spp == 1) && (isizebin == Nsizebins)) {
-                        propmature(area,spp,yr,isizebin) = 1;// eventually code for covariates on dogfish
-                     } else {
+                     // GAVIN FAY 2026-08-05, commenting out hardwire for species 1
 			propmature(area,spp,yr,isizebin) = 1/(1+mfexp(-1.*(maturity_nu(area, spp) +
                                           maturity_omega(area, spp)*lbinmidpt(spp,isizebin)) +
                                           covariates_M(spp,yr)));
-                    }
+                    //}
                    }
 		}
     }
@@ -1403,7 +1409,7 @@ void model_parameters::calc_recruitment(void)
     // if prob < threshold then extreme event occurs and we sample from alternative distribution otherwise from ricker, beverton etc
     for (area=1; area<=Nareas; area++){
   	for(spp=1; spp<=Nspecies; spp++){
-	//	 switch (rectype(spp)){
+		 switch (rectype(spp)){
   //         case 1:	  				//egg production based recruitment, 3 par gamma (Ricker-ish)
 		// 	eggprod(area,spp)(yrct-1) /= Nstepsyr; //average egg production for a single "spawning" timestep
 		// 	//eggprod(area,spp)(yrct) = recruitment_shape(area,spp)/recruitment_beta(area,spp);
@@ -1430,20 +1436,22 @@ void model_parameters::calc_recruitment(void)
   //                                         mfexp(-recruitment_beta(area,spp) * SSB(area,spp)(yrct-1) +
   //                                              recruitment_covwt(spp) * trans(recruitment_cov)(yrct-1));
 		//   break;
-  //         case 4:	  				//SSB based recruitment, 2 par Ricker
-		// 	//SSB(area,spp)(yrct) /= Nstepsyr; //average SSB for a single "spawning" timestep, now SSB is at time t
-		// 	recruitment(area,spp)(yrct) = recruitment_alpha(area,spp) * SSB(area,spp)(yrct-1) *
-  //                                         mfexp(-recruitment_beta(area,spp) * SSB(area,spp)(yrct-1) +
-  //                                              recruitment_covwt(spp) * trans(recruitment_cov)(yrct-1));
-		//   break;
-  //         case 5:	  				//SSB based recruitment, 2 par Beverton Holt
-		// 	//SSB(area,spp)(yrct) /= Nstepsyr; //average SSB for a single "spawning" timestep, now SSB is at time t
-		// 	recruitment(area,spp)(yrct) = recruitment_alpha(area,spp) * SSB(area,spp)(yrct-1) /
-  //                                        (1 + (recruitment_beta(area,spp) * SSB(area,spp)(yrct-1)));
-  //                                    //"effective recruitment" with env covariates; see Quinn & Deriso 1999 p 92
-  //             /////////////////////////////////////////////// WHY -ve recruitment_covwt /////////////////////////////////////////////////////
-  //                                     recruitment(area,spp)(yrct) *= mfexp(-recruitment_covwt(spp) * trans(recruitment_cov)(yrct-1));
-		//   break;
+           case 4:	  				//SSB based recruitment, 2 par Ricker
+		 	//SSB(area,spp)(yrct) /= Nstepsyr; //average SSB for a single "spawning" timestep, now SSB is at time t
+		 	recruitment(area,spp)(yrct) = recruitment_alpha(area,spp) * SSB(area,spp)(yrct-1) *
+                                           mfexp(-recruitment_beta(area,spp) * SSB(area,spp)(yrct-1) +
+                                                recruitment_covwt(spp) * trans(recruitment_cov)(yrct-1));
+      recruitment(area,spp)(yrct) *= mfexp(recruitment_devs(area,spp,yrct)-0.5*recsigma(area, spp)*recsigma(area, spp));
+		   break;
+           case 5:	  				//SSB based recruitment, 2 par Beverton Holt
+		 	//SSB(area,spp)(yrct) /= Nstepsyr; //average SSB for a single "spawning" timestep, now SSB is at time t
+		 	recruitment(area,spp)(yrct) = recruitment_alpha(area,spp) * SSB(area,spp)(yrct-1) /
+                                          (1 + (recruitment_beta(area,spp) * SSB(area,spp)(yrct-1)));
+                                      //"effective recruitment" with env covariates; see Quinn & Deriso 1999 p 92
+               /////////////////////////////////////////////// WHY -ve recruitment_covwt /////////////////////////////////////////////////////
+                                       recruitment(area,spp)(yrct) *= mfexp(-recruitment_covwt(spp) * trans(recruitment_cov)(yrct-1));
+                                       recruitment(area,spp)(yrct) *= mfexp(recruitment_devs(area,spp,yrct)-0.5*recsigma(area, spp)*recsigma(area, spp));
+		   break;
   //          case 6:
 		// 	//SSB(area,spp)(yrct) /= Nstepsyr; //average SSB for a single "spawning" timestep, now SSB is at time t
 		// 	recruitment(area,spp)(yrct) = recruitment_alpha(area,spp) * SSB(area,spp)(yrct-1) /
@@ -1476,17 +1484,19 @@ void model_parameters::calc_recruitment(void)
   //                                    //"effective recruitment" with env covariates; see Quinn & Deriso 1999 p 92
   //                                     recruitment(area,spp)(yrct) *= mfexp(recruitment_covwt(spp) * trans(recruitment_cov)(yrct-1));
   //                break;
-  //          case 9:                   //Average recruitment plus devs--giving up on functional form
+            case 9:                   //Average recruitment plus devs--giving up on functional form
                        //recruitment(area,spp)(yrct) = mfexp(avg_recruitment(area,spp)+recruitment_devs(area,spp,yrct));
                        recruitment(area,spp)(yrct) = avg_recruitment(area,spp)*mfexp(recruitment_devs(area,spp,yrct)-0.5*recsigma(area, spp)*recsigma(area, spp));  //GF 2022/03/04, avg_recruitment is already in real space. This equation does not include lognormal bias correction (yet)
+  //                                    //"effective recruitment" with env covariates; see Quinn & Deriso 1999 p 92
+                                       recruitment(area,spp)(yrct) *= mfexp(recruitment_covwt(spp) * trans(recruitment_cov)(yrct-1));
       //cout << spp << " " << yrct << " " << recruitment(area,spp)(yrct) << " " << avg_recruitment(area,spp) << " " << recruitment_devs(area,spp,yrct) << endl;
       //exit(-1);
-		//   break;
-  //          default:
-  //           exit(1);
-		// } //end switch
+		   break;
+            default:
+             exit(1);
+		 } //end switch
         // if(stochrec(spp)){                //simulate devs around recruitment curve
-        //  // we allow the option of a "large" recruitment event (larger than under log normal) every so often as recommended by
+          //  // we allow the option of a "large" recruitment event (larger than under log normal) every so often as recommended by
         //  // CIE review team (Daniel Howell). We sample a random number from uniform distribution and based on frequency of large event
         //  // (from literature) determine if event should occur for species. We then sample from a distribution of event magnitudes.
         //  // NOT YET IMPLEMENTED
@@ -2195,6 +2205,22 @@ void model_parameters::report(const dvector& gradients)
         if (indicator_fishery_q(area,fleet,spp) == 1)
          report << fleet << " " << year << " " << spp << " " << area << " " << fleet_catch_biomass(area,spp,fleet,year) << endl;
       }}}}       
+    report << "proportion mature" << endl;
+    for (int spp = 1; spp<=Nspecies; spp++) {
+    for (int year=1;year<=Nyrs;year++) {
+    for (int area=1; area<=Nareas; area++) {
+      report << year << " " << spp << " " << area << " " << propmature(area,spp,year) << endl;
+    }
+    }
+    }
+    report << "SSB" << endl;
+    for (area=1; area<=Nareas; area++){
+    for(spp=1; spp<=Nspecies; spp++){
+    for (int year=1;year<=Nyrs;year++) {
+    report << year << " " << spp << " " << area << " " << SSB(area,spp,year) << endl;
+    }
+    }
+    }
 }
 
 model_data::~model_data()
