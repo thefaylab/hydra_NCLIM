@@ -1364,11 +1364,11 @@
 #  init_matrix recGamSSB_beta(1,Nareas,1,Nspecies)			//SSB gamma model beta
   1 1 1 1 1 1 1 1 1 1
 #  init_matrix recRicker_alpha(1,Nareas,1,Nspecies)		//SSB Ricker model alpha
-  1 1 1 1 1 1 1 1 1 1
+  0.7677824 3.4353808 0.8304339 1 0.5302084 3.3751746 4.0808234 2.2484792 1 2.4179728
 #  init_matrix recRicker_shape(1,Nareas,1,Nspecies)		//SSB Ricker model shape parameter=1.0, not used
   1 1 1 1 1 1 1 1 1 1
 #  init_matrix recRicker_beta(1,Nareas,1,Nspecies)			//SSB Ricker model beta
-  1 1 1 1 1 1 1 1 1 1
+  0.2537079 2.5983180 0.5643410 1 1.1489085 2.7836820 2.3878090 1.5602480 1 1.9384483
 #  init_matrix recBH_alpha(1,Nareas,1,Nspecies)		//SSB Beverton Holt model alpha
   0.3374201 6.7681088 0.8746367 1 0.1434868 1 7.4573932 1.9302731 1 1.9110644
 #  init_matrix recBH_shape(1,Nareas,1,Nspecies)		//SSB Beverton Holt model shape parameter=1.0, not used
@@ -1395,23 +1395,23 @@
   1 1 1 1 1 1 1 1 1 1
 #  init_ivector rectype(1,Nspecies)  //switch for alternate recruitment functions 1=gamma/Ricker, 2=Deriso-Schnute, 9=avg+devs
 # 3=SSB gamma, 4=SSB Ricker, 5=SSB Beverton Holt added April 2014,6=Shepherd (added Beet Mar 2017)
-  5 5 5 9 5 9 5 5 9 5
+  4 4 4 9 4 4 4 4 9 4
 #   init_ivector stochrec(1,Nspecies)  //switch for stochastic recruitment. 1 = add error, 0= no error
   0 0 0 0 0 0 0 0 0 0
 #  init_matrix sexratio(1,Nareas,1,Nspecies)  // this is proportion females
   0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5
  #  init_matrix recruitment_covwt(1,Nspecies,1,Nrecruitment_cov)	//recruitment covariate weighting factor
 #  0 0 0 0 0 0 0 0 0 0
-  0.22535147
-  0.28066364
-  -0.25339322
+  -0.17253754
+  -0.15446131
+  -0.16560971
   0
-  -0.15028920
+  -0.15339139
+  -0.13347155
+  -0.02406797
+  -0.15771174
   0
-  -0.09221462
-  0.31119258
-  0
-  0.26800216
+  -0.11323365
 #//fecundity parameters from .dat file and calculate fecundity at length
 #  init_matrix fecund_d(1,Nareas,1,Nspecies)
   1 1 1 1 1 1 1 1 1 1
