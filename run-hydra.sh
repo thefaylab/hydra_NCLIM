@@ -50,4 +50,5 @@
 ./hydra_sim -ind GB-input/hydra_sim_MatRecEnvGroPart_v5.dat -ainp hydra_sim.pin -nohess -maxfn 1   # works; growth, length bins and stomach weights updated for Haddock; growth/length bins updated for Mackerel, Goosefish, Spiny Dogfish
 ./hydra_sim -ind GB-input/hydra_sim_MatRecEnvGroPart_v6.dat -ainp hydra_sim.pin -nohess -maxfn 1   # works; growth and length bins updated for Winter Flounder; length bins updated for Winter Skate
 
+./hydra_sim -ind GB-input/hydra_sim_trouble.dat -ainp no-recdevs.pin -nohess -maxfn 1   # NaNs in likelihoods
 
