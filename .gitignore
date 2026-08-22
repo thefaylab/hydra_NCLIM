@@ -48,7 +48,7 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 
-# HYDRA outputs
+# HYDRA outputs and model files
 *.bar
 *.log
 *.par
@@ -57,3 +57,10 @@ rsconnect/
 *.std
 *.cor
 *.eva
+hydra_sim.tpl
+
+# Annex
+/Annex/
+
+# Stomach content weight tables
+/Stomach content data/
