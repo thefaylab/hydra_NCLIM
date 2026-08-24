@@ -49,18 +49,8 @@ po/*~
 rsconnect/
 
 # HYDRA outputs and model files
-*.bar
-*.log
-*.par
-*.rep
-*.out
-*.std
-*.cor
-*.eva
 hydra_sim.tpl
 
 # Annex
 /Annex/
 
-# Stomach content weight tables
-/Stomach content data/
