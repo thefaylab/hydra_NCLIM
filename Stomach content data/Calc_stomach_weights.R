@@ -4,19 +4,7 @@ gc()
 library(tidyverse)
 library(glmmTMB)
 
-SurveyDataSpring <- read.csv("Stomach content data/NEFSC Surveys/22561_UNION_FSCS_SVBIO.csv")
-SurveyDataSummer <- read.csv("Stomach content data/NEFSC Surveys/22562_UNION_FSCS_SVBIO.csv")
-SurveyDataFall <- read.csv("Stomach content data/NEFSC Surveys/22560_UNION_FSCS_SVBIO.csv")
-SurveyDataWinter <- read.csv("Stomach content data/NEFSC Surveys/22563_UNION_FSCS_SVBIO.csv")
-GrowthData <- read.csv2("Stomach content data/NEFSC Surveys/GrowthData.csv")   # onyl needed to match Species IDs with actual names
-
-Species <- c(15,23,32,72:74,105,106,121,197)
-SurveyData <- rbind(SurveyDataSpring, SurveyDataSummer, SurveyDataFall, SurveyDataWinter) %>% 
-  filter(SVSPP %in% Species) %>% 
-  rename(Length = LENGTH, StomWgt = STOM_WGT) %>% 
-  mutate(SpeciesName = GrowthData$Species[match(SVSPP, GrowthData$SVSPP)]) %>% 
-  filter(!(SpeciesName == "GOOSEFISH" & StomWgt > 1000))    # exclude some extreme outliers
-SurveyData[SurveyData == ""] <- NA
+load("Stomach content data/NEFSC_SurveyData.Rdata")
 
 # Length bin structure used in our current HYDRA model
 Bins <- matrix(c(38, 18,	18,	18,	51,
@@ -71,9 +59,9 @@ PredData <- SurveyData %>%
 PredData$StomWgt <- exp(predict(M2, newdata = PredData))
 
 p1 <- SurveyData %>% ggplot(aes(x = Length, y = StomWgt)) +
-  geom_point(color = "grey60", alpha = .5, show.legend = FALSE) +
+  geom_rug(sides = "b", color = "firebrick3", alpha = .15, length = unit(0.08, "npc")) +
+  geom_point(data = StomachData, color = "grey60", alpha = .4, pch = 1, show.legend = FALSE) +
   geom_line(data = PredData, show.legend = FALSE) +
-  geom_rug(sides = "b", alpha = .2, length = unit(0.08, "npc")) +
   theme_bw() +
   facet_wrap(~SpeciesName, scales = "free")
 p1
@@ -101,16 +89,11 @@ for (sp in 1:nrow(BinCum)) {
   StomachWeights <- rbind(StomachWeights, SpRes)
 }
 
-p2 <- SurveyData %>% ggplot(aes(x = Length, y = StomWgt)) +
-  geom_rug(sides = "b", length = unit(0.08, "npc")) +
-  geom_point(color = "grey60", alpha = .4, pch = 1, show.legend = FALSE) +
-  geom_line(data = PredData, show.legend = FALSE) +
+p2 <- p1 +
   geom_segment(data = StomachWeights, 
                aes(color = LengthBin, y = MeanWeight, x = Lower, xend = Upper),
                show.legend = FALSE) +
-  labs(x = "Length (cm)", y = "Stomach weight (g)") +
-  theme_bw() +
-  facet_wrap(~SpeciesName, scales = "free") + 
+  labs(x = "Length (cm)", y = "Stomach weight (g)") + 
   theme(legend.position = "bottom",
         strip.text = element_text(size = 6))
 ggsave(p2, file = "Stomach content data/Results_TweedieGLMM.png", dpi = 600, height = 4, width = 6, units = "in")

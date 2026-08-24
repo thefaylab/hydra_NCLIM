@@ -48,9 +48,19 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 
-# HYDRA outputs and model files
+# HYDRA model code and output files
+*.bar
+*.htp
+*.cpp
+*.obj
+fmin.txt
+hydra_sim.txt
 hydra_sim.tpl
 
 # Annex
 /Annex/
 
+# Stomach weight analysis files
+/Stomach content data/Tables Sarah and 1984 report
+/Stomach content data/NEFSC Surveys
+/Stomach content data/Merge_survey_data.R
