@@ -27,7 +27,7 @@ SurveyData <- SurveyData %>%
 # Data subset with stomach weight observations
 StomachData <- SurveyData %>% drop_na(StomWgt)
 
-# Fit a Tweedie GLMM to predict stomach weight from body length (exponential relationship assumed)  
+# Fit a Tweedie GLMM to predict stomach weight from body length (power law relationship assumed)  
 StomachData$logLength <- log(StomachData$Length)
 M1 <- glmmTMB(StomWgt ~ logLength + (1 | SpeciesName), data = StomachData, 
               family = tweedie(link = "log"))
@@ -56,7 +56,7 @@ PredData <- SurveyData %>%
                        max(Length, na.rm = TRUE),
                        length.out = 100)) %>%
   mutate(logLength = log(Length))
-PredData$StomWgt <- exp(predict(M2, newdata = PredData))
+PredData$StomWgt <- predict(M2, newdata = PredData, type = "response")
 
 p1 <- SurveyData %>% ggplot(aes(x = Length, y = StomWgt)) +
   geom_rug(sides = "b", color = "firebrick3", alpha = .15, length = unit(0.08, "npc")) +
