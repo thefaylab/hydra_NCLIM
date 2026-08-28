@@ -1364,11 +1364,11 @@
 #  init_matrix recGamSSB_beta(1,Nareas,1,Nspecies)			//SSB gamma model beta
   1 1 1 1 1 1 1 1 1 1
 #  init_matrix recRicker_alpha(1,Nareas,1,Nspecies)		//SSB Ricker model alpha
-  0.151745030088211 27.1970854668082 1.91959215344712 1 1.47738985835463 7.47 1622.76378210308 3.55735393921199 1 6.27061467122631
+  0.151745 27.197085 0.00721 1 1.47739 0.03227 0.00433 3.557354 1 6.270615
 #  init_matrix recRicker_shape(1,Nareas,1,Nspecies)		//SSB Ricker model shape parameter=1.0, not used
   1 1 1 1 1 1 1 1 1 1
 #  init_matrix recRicker_beta(1,Nareas,1,Nspecies)			//SSB Ricker model beta
-  0.00000608310077197913 0.00000194150640697343 0.000000478906110177673 1 0.00000474786976557346 0.000000333 0.00411549287628093 0.0000938269286447945 1 0.000039162669392098
+  0.0000060831008 0.0000064033852 0.00000084 1 0.0000047478698 0.000016 0.0000032 0.0000938269286 1 0.0000391626694
 #  init_matrix recBH_alpha(1,Nareas,1,Nspecies)		//SSB Beverton Holt model alpha
   0.3374201 6.7681088 0.8746367 1 0.1434868 1 7.4573932 1.9302731 1 1.9110644
 #  init_matrix recBH_shape(1,Nareas,1,Nspecies)		//SSB Beverton Holt model shape parameter=1.0, not used
