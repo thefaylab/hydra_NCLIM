@@ -1,1 +1,1 @@
-./hydra_sim -ind GB-input/hydra_sim_trouble.dat -ainp no-recdevs.pin -nohess -maxfn 1 
+./hydra_sim -ind GB-input/hydra_sim_NCLIM.dat -ainp no-recdevs.pin -nohess -maxfn 0
