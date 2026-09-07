@@ -51,7 +51,6 @@ rsconnect/
 # HYDRA model code and output files
 *.bar
 *.htp
-*.cpp
 *.obj
 fmin.txt
 hydra_sim.txt

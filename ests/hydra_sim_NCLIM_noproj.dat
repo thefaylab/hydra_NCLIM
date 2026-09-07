@@ -639,16 +639,16 @@
 #  init_matrix growth_kappa(1,Nareas,1,Nspecies)
   0.734859369 0.456436561 0.26327238 0.955590716 0.502070649 0.648621251 0.688187 0.552886341 0.59567 0.618898136
 #  init_matrix growth_covwt(1,Nspecies,1,Ngrowth_cov)// growth covariate weighting factor
-  -0.049657788
-  0.016220021
-  0.065692816
+  -0.088555552
+  -0.022677744
+  0.026795052
   0
-  -0.163233309
-  0.090723076
+  -0.202131073
+  0.051825311
   0
-  0.004328592
+  -0.034569172
   0
-  0.035758550
+  -0.003139214
 #  init_matrix vonB_Linf(1,Nareas,1,Nspecies)    //alternate parameterization, vonB growth
   102.03928 31.16029 34.60559 84.5 58.55415 39.38117 99.99 54.41435 114.1 50.16992
 #  init_matrix vonB_k(1,Nareas,1,Nspecies)       //alternate parameterization, vonB growth
