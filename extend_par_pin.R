@@ -7,9 +7,9 @@ library(tidyverse)
 options(scipen = 999)
 
 # Which (output) file to read? 
-File <- "ests/hydra_sim.par"
+File <- "ests/est_survey_q/hydra_sim.par"
 
-# Read it it line-by-line
+# Read it in line-by-line
 L <- readLines(File)
 
 # Function for extracting a specific variable from the output file
@@ -39,7 +39,7 @@ PlotF <- data.frame(Year = rep(1978:2100, 3),
                     F_est = c(F_Ext[[1]], F_Ext[[2]], F_Ext[[3]]))
 PlotF %>% ggplot(aes(x = Year, y = F_est, color = Fleet)) +
   geom_line()
-# --> averaging across the most recent 10 years is probably better than just 5 (especially for fleet 3)
+# --> averaging across the latest 10 years is probably better than just 5 (especially for fleet 3)
 
 # Replace the extended F series block in the .par "table"
 i <- grep(paste0("^# ", "F_devs"), L)[1]
@@ -51,7 +51,6 @@ L[(i+1):(j-1)] <- sapply(F_Ext, function(x) paste("", format(x, digits = 10, tri
 
 
 # EXTENDING THE RECRUITMENT TIME SERIES
-set.seed(100)
 Rec_devs <- get_par(L, "recruitment_devs")
 Rec_sigma <- get_par(L, "ln_recsigma")
 N_years_Rec <- length(Rec_devs[[1]])
@@ -69,4 +68,4 @@ j <- j[j > i][1]
 L[(i+1):(j-1)] <- sapply(RecExt, function(x) paste("", format(x, digits = 10, trim = TRUE), collapse = ""))
 
 # Store the extended .pin file for projection 
-writeLines(L, "GB-input/Projection/hydra_NCLIM_proj.pin")
+writeLines(L, "GB-input/Projection/proj_survey_q.pin")
