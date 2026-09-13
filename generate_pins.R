@@ -25,7 +25,9 @@ generate_pins <- function(N, TempFile, FitFile, Folder, RecAssumption) {
     MeanProj <- rep(0, length(Rec_devs))
   } else if (RecAssumption == 2) {
     MeanProj <- sapply(Rec_devs_fit, function(x) mean(tail(x, 10)))
-  } 
+  } else if (RecAssumption == 3) {
+    MeanProj <- c(rep(0.125, 3), 0.005, 0.125, 0.125, 0.005, 0.005, 0.125, 0.125)
+  }
   
   # Generate the extended recruitment time series
   RecExt <- list()
@@ -48,7 +50,9 @@ generate_pins <- function(N, TempFile, FitFile, Folder, RecAssumption) {
 
 TempFile = "GB-input/Projection/proj_survey_q.pin"   # template file (extended .pin file including projection period; e.g. generated with extend_par_pin)
 FitFile = "ests/est_survey_q/hydra_sim.par"   # .pin/.par file from the model fitting (i.e. without projections) 
-Folder = "GB-input/Projection/Sim_SSP126_survey_q"   # output folder
-RecAssumption = 1
+Folder = "GB-input/Projection/Sim_SSP126_nocovwt_gro"   # output folder
+RecAssumption = 1   # 1) extend stochastically with mean = 0, SD = exp(ln_recsigma); 2) extend stochastically with latest-10-yr mean; 3) extend stochastically with "Gavin's" means
+
+dir.create(Folder, showWarnings = FALSE)
 
 generate_pins(100, TempFile, FitFile, Folder, RecAssumption)
